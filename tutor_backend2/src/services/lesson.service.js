@@ -190,15 +190,17 @@ class LessonService {
 
     async getUpcomingLessons(user_id, role) {
         try {
-            const lessons = await lessonRepository.getUpcomingLessons(user_id, role);
-            // Форматируем уроки для фронтенда
-            return await Promise.all(lessons.map(lesson => this.formatLessonForFrontend(lesson, role)));
+            // Используем getUpcomingWithPendingRequests вместо getUpcomingLessons,
+            // чтобы получить данные о pending запросах на перенос
+            const lessons = await lessonRepository.getUpcomingWithPendingRequests(user_id, role);
+            // Форматируем уроки для фронтенда, передавая user_id для определения is_responder
+            return await Promise.all(lessons.map(lesson => this.formatLessonForFrontend(lesson, role, user_id)));
         } catch (error) {
             throw new Error(`Failed to get upcoming lessons: ${error.message}`);
         }
     }
 
-    async formatLessonForFrontend(lessonData, userRole) {
+    async formatLessonForFrontend(lessonData, userRole, userId = null) {
         try {
             // Проверяем наличие обязательных полей
             // Для pending requests lesson_id может быть null, используем request_id
@@ -440,6 +442,22 @@ class LessonService {
             if (status === 'cancelled') {
                 result.cancelled_reason = cancelledReason;
                 result.cancelled_at = cancelledAt;
+            }
+
+            // Добавляем данные о pending запросе на перенос (если есть)
+            if (lessonData.change_status === 'pending' && lessonData.change_id) {
+                // Определяем, является ли текущий пользователь ответчиком
+                const isResponder = userId && lessonData.responder_id === userId;
+                
+                result.pending_change_request = {
+                    change_id: lessonData.change_id,
+                    proposed_date: lessonData.proposed_date,
+                    proposed_time: lessonData.proposed_time,
+                    comment: lessonData.change_comment,
+                    status: lessonData.change_status,
+                    requester_id: lessonData.requester_id,
+                    is_responder: isResponder
+                };
             }
 
             return result;
