@@ -40,8 +40,9 @@ export function TutorDashboard() {
             }
 
             const formatted = {
-                id: lesson.lesson_id || lesson.id,
+                id: lesson.lesson_id || lesson.request_id || lesson.id,
                 lesson_id: lesson.lesson_id || lesson.id,
+                request_id: lesson.request_id,
                 subject: lesson.subject_name || lesson.subject,
                 student: {
                     id: lesson.student_id,

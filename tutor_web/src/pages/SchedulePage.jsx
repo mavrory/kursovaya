@@ -58,13 +58,28 @@ export function SchedulePage() {
                             }
                         }
 
-                        // Нормализуем дату
+                        // Нормализуем дату (исправляем проблему с часовыми поясами)
                         let normalizedDate = '';
                         if (item.date) {
                             if (typeof item.date === 'string') {
-                                normalizedDate = item.date.split('T')[0].split(' ')[0];
+                                // Если это строка в формате YYYY-MM-DD, используем как есть
+                                if (/^\d{4}-\d{2}-\d{2}$/.test(item.date)) {
+                                    normalizedDate = item.date;
+                                } else {
+                                    // Иначе парсим и используем локальное время
+                                    const date = new Date(item.date);
+                                    const year = date.getFullYear();
+                                    const month = String(date.getMonth() + 1).padStart(2, '0');
+                                    const day = String(date.getDate()).padStart(2, '0');
+                                    normalizedDate = `${year}-${month}-${day}`;
+                                }
                             } else {
-                                normalizedDate = new Date(item.date).toISOString().split('T')[0];
+                                // Для объектов Date используем локальное время
+                                const date = new Date(item.date);
+                                const year = date.getFullYear();
+                                const month = String(date.getMonth() + 1).padStart(2, '0');
+                                const day = String(date.getDate()).padStart(2, '0');
+                                normalizedDate = `${year}-${month}-${day}`;
                             }
                         }
 
@@ -294,13 +309,28 @@ export function SchedulePage() {
                                 }
                             }
 
-                            // Нормализуем дату
+                            // Нормализуем дату (исправляем проблему с часовыми поясами)
                             let normalizedDate = '';
                             if (item.date) {
                                 if (typeof item.date === 'string') {
-                                    normalizedDate = item.date.split('T')[0].split(' ')[0];
+                                    // Если это строка в формате YYYY-MM-DD, используем как есть
+                                    if (/^\d{4}-\d{2}-\d{2}$/.test(item.date)) {
+                                        normalizedDate = item.date;
+                                    } else {
+                                        // Иначе парсим и используем локальное время
+                                        const date = new Date(item.date);
+                                        const year = date.getFullYear();
+                                        const month = String(date.getMonth() + 1).padStart(2, '0');
+                                        const day = String(date.getDate()).padStart(2, '0');
+                                        normalizedDate = `${year}-${month}-${day}`;
+                                    }
                                 } else {
-                                    normalizedDate = new Date(item.date).toISOString().split('T')[0];
+                                    // Для объектов Date используем локальное время
+                                    const date = new Date(item.date);
+                                    const year = date.getFullYear();
+                                    const month = String(date.getMonth() + 1).padStart(2, '0');
+                                    const day = String(date.getDate()).padStart(2, '0');
+                                    normalizedDate = `${year}-${month}-${day}`;
                                 }
                             }
 

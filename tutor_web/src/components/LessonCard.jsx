@@ -144,17 +144,30 @@ export function LessonCard({ lesson, viewType = 'student', onAction, onRate, occ
     const isRequester = useMemo(() => {
         if (!pendingChangeRequest || !pendingChangeRequest.requester_id) return false;
 
-        // Здесь нужно получить ID текущего пользователя
-        // В реальном приложении это должно быть из контекста или пропсов
-        const currentUserId = parseInt(localStorage.getItem('user_id') || '0');
+        // Получаем ID текущего пользователя из localStorage
+        const userStr = localStorage.getItem('user');
+        const user = userStr ? JSON.parse(userStr) : {};
+        const currentUserId = user.user_id || user.id;
+        
         return pendingChangeRequest.requester_id === currentUserId;
     }, [pendingChangeRequest]);
 
     // Определяем, является ли текущий пользователь ответчиком
+    // ИСПОЛЬЗУЕМ is_responder из pending_change_request, который приходит с бэкенда
     const isResponder = useMemo(() => {
-        if (!pendingChangeRequest || !lesson) return false;
-
-        const currentUserId = parseInt(localStorage.getItem('user_id') || '0');
+        if (!pendingChangeRequest) return false;
+        
+        // Если is_responder уже пришел с бэкенда, используем его
+        if (typeof pendingChangeRequest.is_responder === 'boolean') {
+            return pendingChangeRequest.is_responder;
+        }
+        
+        // Fallback: определяем вручную, если is_responder не пришел
+        if (!lesson) return false;
+        
+        const userStr = localStorage.getItem('user');
+        const user = userStr ? JSON.parse(userStr) : {};
+        const currentUserId = user.user_id || user.id;
         const isLessonParticipant = currentUserId === lesson.student_id || currentUserId === lesson.tutor_id;
 
         // Ответчик - это участник урока, который НЕ является инициатором

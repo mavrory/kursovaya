@@ -399,6 +399,7 @@ class LessonService {
             // Используем request_id как идентификатор, если lesson_id отсутствует (для pending requests)
             const result = {
                 lesson_id: lessonData.lesson_id || lessonData.request_id, // Для pending используем request_id
+                request_id: lessonData.request_id || null, // Добавляем request_id для pending requests
                 subject_name: subject, // Строка или null
                 scheduled_for: scheduledFor, // ISO строка (объединенные date + time)
                 duration: duration, // В минутах
